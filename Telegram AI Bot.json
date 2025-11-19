@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -592,
+        -912,
         -400
       ],
       "id": "6105060f-e069-44c6-a3b0-54a74ff7e5eb",
@@ -20,7 +20,7 @@
       "credentials": {
         "telegramApi": {
           "id": "vZNb5z9eC6C4vgPV",
-          "name": "Telegram account 2"
+          "name": "AI Chatbot"
         }
       }
     },
@@ -29,14 +29,13 @@
         "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
         "text": "={{ $json.output }}",
         "additionalFields": {
-          "appendAttribution": false,
-          "parse_mode": "HTML"
+          "appendAttribution": false
         }
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        416,
+        624,
         -400
       ],
       "id": "9f1c179c-840a-4668-acb5-2b07ed828019",
@@ -45,7 +44,7 @@
       "credentials": {
         "telegramApi": {
           "id": "vZNb5z9eC6C4vgPV",
-          "name": "Telegram account 2"
+          "name": "AI Chatbot"
         }
       }
     },
@@ -54,37 +53,17 @@
         "promptType": "define",
         "text": "={{ $json.message.text }}",
         "options": {
-          "systemMessage": "You are a helpful telegram assistant and use tool when user asked for recent data using tavily tool"
+          "systemMessage": "You are a helpful telegram assistant and use tool when user asked for recent data using tavily tool and when user asked about any other information then use pinecone tool. If you can answer the question on your own, then go ahead and do it. Answer should be in text format without any parsing errors."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        -160,
-        -400
+        64,
+        -416
       ],
       "id": "4d893bd4-9f8b-4955-93dc-8c566346a980",
       "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "model": "meta-llama/llama-4-maverick:free",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [
-        -320,
-        -80
-      ],
-      "id": "99122fa8-81dc-4635-97ab-543d9a8281f4",
-      "name": "OpenRouter Chat Model",
-      "credentials": {
-        "openRouterApi": {
-          "id": "Xy8tmrCLG0ZpDL1O",
-          "name": "OpenRouter account"
-        }
-      }
     },
     {
       "parameters": {
@@ -95,22 +74,22 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -112,
-        -80
+        48,
+        -32
       ],
       "id": "50657f24-eea6-4526-a941-8087e4b4d3e5",
       "name": "Simple Memory"
     },
     {
       "parameters": {
-        "query": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', `Searches Web for Realtime information`, 'string') }}",
         "options": {}
       },
       "type": "@tavily/n8n-nodes-tavily.tavilyTool",
       "typeVersion": 1,
       "position": [
-        16,
-        -80
+        208,
+        -192
       ],
       "id": "5fa08d2c-fc9b-4346-b253-856ea089f12e",
       "name": "Search in Tavily",
@@ -118,6 +97,242 @@
         "tavilyApi": {
           "id": "621VCUzrdeeSNIF1",
           "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Answers question about Vinay kumar. Refer to this tool for knowing about Vinay Kumar",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n1",
+          "mode": "list",
+          "cachedResultName": "n8n1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        -144
+      ],
+      "id": "aa40ec6d-822c-4dd9-86c0-283186adda09",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "NNUHEShokfYBmXTN",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        64
+      ],
+      "id": "4da0b97f-f2fc-4bb0-b0cb-b92a0dd6bc76",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WM8H5oCGBM12XVI1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "093440c9-1b37-49c1-97e4-9ab12eba9fe3",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        -400
+      ],
+      "id": "94b42e14-1634-4b0b-a085-8de741df1550",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ebf187d-c788-4d9c-8061-6d2e9271bf90",
+              "leftValue": "={{ $json.message.document.mime_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        -96
+      ],
+      "id": "454ce8f2-3d6a-4d86-abb6-09f1647434a6",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n1",
+          "mode": "list",
+          "cachedResultName": "n8n1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -96
+      ],
+      "id": "48220fc8-4ba8-4ea4-b874-44b78379d813",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "NNUHEShokfYBmXTN",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        192
+      ],
+      "id": "53f30979-f60e-485b-be47-37e47c7679b1",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WM8H5oCGBM12XVI1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -384,
+        80
+      ],
+      "id": "23d858e9-972a-477f-8c56-001c9ddb373b",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        -128
+      ],
+      "id": "36b96486-0f76-4c6d-88d3-6a8a6fbeb721",
+      "name": "Get a file",
+      "webhookId": "93bb4537-ba0c-4328-b005-ab5847e2af5f",
+      "credentials": {
+        "telegramApi": {
+          "id": "vZNb5z9eC6C4vgPV",
+          "name": "AI Chatbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1855644256",
+        "text": "Uploaded the File into Pinecone Vector database you can ask me now  questions about it now.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        64
+      ],
+      "id": "6a251129-03fc-4c32-b08c-c98170295480",
+      "name": "Send a text message1",
+      "webhookId": "423d2cfd-5e8e-4663-84ec-683c37253b13",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "vZNb5z9eC6C4vgPV",
+          "name": "AI Chatbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -208
+      ],
+      "id": "cceb2c81-2091-4194-9229-d84f4eae30d3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WM8H5oCGBM12XVI1",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
@@ -128,7 +343,7 @@
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -141,17 +356,6 @@
           {
             "node": "Send a text message",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenRouter Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -178,13 +382,124 @@
           }
         ]
       ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d34e9f5f-c3e4-49ab-bedb-1c67e693ef8e",
+  "versionId": "4dda4fd2-c956-42d4-a5a7-7e405458d343",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "784b35d6c527fa8a569de3e1ae08d1437f562638a0dee8dbc6272d4251984db5"
