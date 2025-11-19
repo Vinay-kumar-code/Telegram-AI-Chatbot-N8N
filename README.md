@@ -10,89 +10,116 @@
 
 
 
+🤖 n8n Context-Aware Telegram AI Chatbot
 
+A powerful, intelligent chatbot built entirely on the n8n automation platform. Unlike standard bots, this agent possesses conversational memory, access to real-time internet data, and a distinct personality.
 
-n8n-based Telegram AI Chatbot 🤖
-A powerful, context-aware AI chatbot for Telegram, built entirely on the n8n automation platform. This chatbot provides fun and engaging conversations, has access to real-time information from the web, and remembers the context of your conversation.
-
-
+It leverages Meta Llama 4 Scout (via OpenRouter) for reasoning and Tavily for web searching, making it a truly capable assistant.
 
 ✨ Key Features
-This isn't just another chatbot. It's a smart agent designed to be a helpful and interesting conversation partner.
 
-🧠 Conversational Memory: The agent remembers the last 10 messages in the chat history, allowing for natural, context-aware follow-up questions and discussions.
+🧠 Conversational Memory The bot remembers the last 10 messages in the chat history. It understands context, allowing for natural follow-up questions without needing to repeat details.
 
-🌐 Real-Time Web Access: Using the Tavily Web Scraper Tool, the chatbot can answer questions about recent events, news, and topics by searching the web, ensuring its knowledge is always up-to-date.
+🌐 Real-Time Web Access Powered by the Tavily Web Scraper Tool, the agent detects when it needs to search the internet to answer questions about current events, news, or specific data points.
 
-😄 Fun & Engaging Personality: The AI is prompted to be friendly, witty, and engaging, making interactions feel less robotic and more human-like.
+💬 Engaging Personality Prompted to be friendly, witty, and human-like, moving away from robotic "I am an AI" responses.
 
-🚀 Low-Code Implementation: Built on n8n, this project is easy to manage, modify, and extend, even with minimal coding knowledge.
+🚀 Low-Code Architecture Built on n8n, making the workflow visual, easy to debug, and simple to extend without complex coding.
 
-⚙️ How It Works: The Workflow
-The entire logic is contained within a single n8n workflow that orchestrates the different services.
+⚙️ How It Works
 
-⬇️ Receive Message: The workflow starts when the Telegram Trigger node receives a new message from a user.
+The entire logic is contained within a single n8n workflow that orchestrates the services.
 
-💾 Store & Retrieve History: The workflow appends the new message to a stored chat history (limited to the last 10 messages) and retrieves this history for context.
+⬇️ Receive Message: The Telegram Trigger node detects a new incoming message.
 
-🤖 Process with AI Agent: The user's message, along with the chat history, is sent to an AI Agent.
+💾 Context Retrieval: The workflow retrieves the last 10 messages associated with that specific user ID.
 
-🔎 Web Search (If Needed): The AI agent determines if it needs fresh information to answer the query. If so, it activates the Tavily tool to perform a web search.
+🤖 AI Processing: The message and history are sent to the AI Agent (Llama 4 Scout).
 
-💬 Generate Response: The agent combines its base knowledge, the chat history, and any new information from the web to formulate a comprehensive and relevant response.
+🔎 Web Search (Auto-Tool): If the AI determines the query requires external data (e.g., "What is the stock price of Apple right now?"), it triggers the Tavily tool.
 
-⬆️ Send Reply: The final generated message is sent back to the user on Telegram via the Telegram node.
+📝 Response Generation: The agent synthesizes its training data, chat history, and web results into a cohesive answer.
 
-🛠️ Setup & Installation
-To get your own instance of this chatbot running, follow these steps.
+⬆️ Send Reply: The response is sent back to the user via the Telegram API.
+
+💾 Storage Update: The new interaction is appended to the chat history for future context.
+
+🛠️ Tech Stack
+
+Orchestration: n8n (Cloud or Self-Hosted)
+
+Messaging: Telegram Bot API
+
+LLM Provider: OpenRouter API
+
+Model: Meta Llama 4 Scout
+
+Web Search: Tavily API
+
+🚀 Getting Started
 
 Prerequisites
-You will need the following accounts and credentials:
 
-An active n8n instance (either on n8n.cloud or self-hosted).
+Before importing the workflow, ensure you have the following:
 
-A Telegram Bot Token. You can get one by talking to the BotFather on Telegram.
+n8n Instance: An active account on n8n.cloud or a self-hosted instance.
 
-A Tavily API Key for the web scraping functionality.
+Telegram Bot Token: Create a bot via @BotFather on Telegram.
 
-An API key for your chosen Large Language Model (LLM) provider (e.g., OpenAI, Cohere, Anthropic). In my case openrouter api and Meta llama 4 scout llm.
+Tavily API Key: Sign up at Tavily for web search capabilities.
 
-Installation Steps
-Download the Workflow: Grab the workflow.json file from this repository.
+OpenRouter API Key: Sign up at OpenRouter to access the Llama 4 Scout model.
+
+Installation
+
+Download the Workflow:
+
+Download the workflow.json file from this repository.
 
 Import to n8n:
 
-In your n8n canvas, click Import from File.
+Open your n8n canvas.
 
-Select the workflow.json file you just downloaded.
+Click the menu (top right) -> Import from File.
+
+Select the workflow.json file.
 
 Configure Credentials:
 
-In the n8n workflow, you will see nodes that require credentials (Telegram, Tavily, and your LLM).
+Telegram Node: Create a new credential type "Telegram API" and paste your Bot Token.
 
-Click on each node and either select your existing credentials from the dropdown or create new ones by pasting in your API keys/tokens.
+Tavily Node: Create a new credential type "Tavily API" and paste your key.
 
-Activate the Workflow: Once all credentials are set up, save the workflow and activate it using the toggle at the top right of the screen.
+OpenRouter/LLM Node: In the AI Model node, select "OpenAI-compatible" (or the specific OpenRouter node if you have the community node installed) and input your API key and Base URL.
 
-🚀 Usage
-Once the workflow is active, just open a chat with your bot on Telegram and start talking to it!
+Activate:
 
-You can try asking it:
+Click Save.
 
-A simple question: What is the capital of Mongolia?
+Toggle the Active switch to On (top right corner).
 
-A recent event question: What were the main highlights from the biggest tech conference last week?
+💡 Usage Examples
 
-A follow-up question:
+Once the workflow is active, open your bot in Telegram and start chatting.
+
+1. General Knowledge
 
 User: Who directed the movie "Inception"?
-
 Bot: "Inception" was directed by Christopher Nolan.
 
+2. Contextual Follow-up (Memory Test)
+
 User: What other movies has he directed?
+Bot: Christopher Nolan has also directed "The Dark Knight Trilogy", "Interstellar", "Dunkirk", "Tenet", and "Oppenheimer".
+
+3. Real-Time Information (Tavily Search)
+
+User: What were the main highlights from the biggest tech conference last week?
+Bot: [Bot searches the web] Last week at [Conference Name], the biggest highlights were the release of [Product X] and the announcement regarding [Topic Y]...
 
 🤝 Contributing
-Pull requests are welcome! If you have ideas for improvements, new features, or bug fixes, please feel free to open an issue or submit a pull request.
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
 Fork the Project
 
@@ -105,4 +132,5 @@ Push to the Branch (git push origin feature/AmazingFeature)
 Open a Pull Request
 
 📄 License
-This project is distributed under the GPL-3.0 License. See the LICENSE file for more information.
+
+Distributed under the GPL-3.0 License. See LICENSE for more information.
